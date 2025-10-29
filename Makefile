@@ -7,7 +7,7 @@ else
 	EXEEXT =
 endif
 
-all: circuit_simulator$(EXEEXT) logic_simulator$(EXEEXT) logic_simulator_n$(EXEEXT)
+all: circuit_simulator$(EXEEXT) logic_simulator$(EXEEXT) logic_simulator_n$(EXEEXT) simulator$(EXEEXT)
 
 circuit_simulator$(EXEEXT): src/logic_simulator_circuit.c src/gates.c
 	$(CC) $(CFLAGS) src/logic_simulator_circuit.c src/gates.c -o circuit_simulator$(EXEEXT)
@@ -18,5 +18,8 @@ logic_simulator$(EXEEXT): src/logic_simulator.c src/gates.c
 logic_simulator_n$(EXEEXT): src/logic_simulator_circuit_n.c src/gates.c
 	$(CC) $(CFLAGS) src/logic_simulator_circuit_n.c src/gates.c -o logic_simulator_n$(EXEEXT)
 
+simulator$(EXEEXT): src/sim.c src/graph.c src/gates.c
+	$(CC) $(CFLAGS) src/sim.c src/graph.c src/gates.c -o simulator$(EXEEXT)
+
 clean:
-	$(RM) circuit_simulator$(EXEEXT) logic_simulator$(EXEEXT) logic_simulator_n$(EXEEXT)
+	$(RM) circuit_simulator$(EXEEXT) logic_simulator$(EXEEXT) logic_simulator_n$(EXEEXT) simulator$(EXEEXT)

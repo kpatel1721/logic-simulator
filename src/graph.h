@@ -15,6 +15,8 @@ typedef struct {
 
 
 void InitializeList(NodeList *l);
-void CreateCircuitList(FILE *f, NodeList *l);
+int CreateCircuitList(FILE *f, NodeList *l);
 void PrintCircuit(NodeList *l);
 void FreeCircuitList(NodeList *l);
+void SimulateCircuit(NodeList *l, int NodeCount);
+int GetInput(NodeList *l, int id, int NodeCount);

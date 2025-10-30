@@ -18,10 +18,10 @@ int main(int argc, char *argv[]) {
   NodeList list;
   InitializeList(&list);
 
-  CreateCircuitList(logicCircuit, &list);
+  int NodeCount = CreateCircuitList(logicCircuit, &list);
   PrintCircuit(&list);
 
-
+  SimulateCircuit(&list, NodeCount);
 
 
 

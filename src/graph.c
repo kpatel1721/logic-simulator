@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "graph.h"
+#include "gates.h"
 
 void InitializeList(NodeList *l) {
   l->first = l->last = NULL;
 }
 
-void CreateCircuitList(FILE *f, NodeList *l) {
+int CreateCircuitList(FILE *f, NodeList *l) {
   char buffer[64];
   int id, in1, in2, i;
   char type;
@@ -27,7 +28,6 @@ void CreateCircuitList(FILE *f, NodeList *l) {
       continue;
     }
 
-    // Ask if you can use this or figure out how to replace it
     if (sscanf(buffer, "%d: %c %d %d", &id, &type, &in1, &in2) != 4) {
       printf("Warning invalidline: %s", buffer);
       continue;
@@ -54,8 +54,8 @@ void CreateCircuitList(FILE *f, NodeList *l) {
       l->last = n;
     }
   }
-
-  }
+  return NodeCount;
+}
 
 void PrintCircuit(NodeList *l) {
   Node *head = l->first;
@@ -74,4 +74,68 @@ void FreeCircuitList(NodeList *l) {
     free(current);
     current = next;
   }
+}
+
+void SimulateCircuit(NodeList *l, int NodeCount) {
+  Node *head = l->first;
+  int input1, input2;
+
+  while (head != NULL) {
+    if (head->type == 'I') {
+      printf("Enter input 0 or 1 for ID: %d\n", head->id);
+      scanf("%d", &head->output);
+      while (head->output != 0 && head->output != 1) {
+        printf("Invalid Input Try Again\n");
+        scanf("%d", &head->output);
+      }
+    }
+    else if (head->type == 'A') {
+      input1 = GetInput(l, head->input1, NodeCount);
+      input2 = GetInput(l, head->input2, NodeCount);
+      head->output = and(input1, input2);
+    }
+    else if (head->type == 'O') {
+      input1 = GetInput(l, head->input1, NodeCount);
+      input2 = GetInput(l, head->input2, NodeCount);
+      head->output = or(input1, input2);
+    }
+    else if (head->type == 'X') {
+      input1 = GetInput(l, head->input1, NodeCount);
+      input2 = GetInput(l, head->input2, NodeCount);
+      head->output = xor(input1, input2);
+    }
+    else if (head->type == 'N') {
+      input1 = GetInput(l, head->input1, NodeCount);
+      head->output = not(input1);
+    }
+    else if (head->type == 'Q') {
+      input1 = GetInput(l,head->input1, NodeCount);
+      printf("Output at Id %d: %d\n", head->id, input1);
+    }
+    head = head->next;
+  }
+  return;
+}
+
+int GetInput(NodeList *l, int id, int NodeCount) {
+  if (id <= NodeCount/2) {
+    Node *head = l->first;
+    while (head != NULL) {
+      if (head->id == id) {
+        return head->output;
+      }
+      head = head->next;
+    }
+  }
+  else {
+    Node *head = l->last;
+    while (head != NULL) {
+      if (head->id == id) {
+        return head->output;
+      }
+      head = head->prev;
+    }
+  }
+  // Should never reach this
+  return -1;
 }

@@ -39,10 +39,26 @@ int CreateCircuitList(FILE *f, NodeList *l) {
       exit(1);
     }
 
+    InputNode *first = malloc(sizeof(InputNode));
+    if (first == NULL) {
+      printf("Malloc Failed\n");
+      exit(1);
+    }
+    first->data = in1;
+
+    InputNode *second = malloc(sizeof(InputNode));
+    if (second == NULL) {
+      printf("Malloc Failed\n");
+      exit(1);
+    }
+    second->data = in2;
+    second->next = NULL;
+
+    first->next = second;
+    n->input = first;
+    n->output = 0;
     n->id = id;
     n->type = type;
-    n->input1 = in1;
-    n->input2 = in2;
     if (l->first == NULL) {
       n->prev = n->next = NULL;
       l->first = l->last = n;
@@ -60,7 +76,7 @@ int CreateCircuitList(FILE *f, NodeList *l) {
 void PrintCircuit(NodeList *l) {
   Node *head = l->first;
   while (head != NULL) {
-    printf("Id: %d Type: %c Input: %d %d\n", head->id, head->type, head->input1, head->input2);
+    printf("Id: %d Type: %c Input: %d %d\n", head->id, head->type, head->input->data, head->input->next->data);
     head = head->next;
   }
 }
@@ -71,6 +87,12 @@ void FreeCircuitList(NodeList *l) {
 
   while (current != NULL) {
     next = current->next;
+    InputNode *in = current->input;
+    while (in != NULL) {
+      InputNode *in_next = in->next;
+      free(in);
+      in = in_next;
+    }
     free(current);
     current = next;
   }
@@ -90,26 +112,26 @@ void SimulateCircuit(NodeList *l, int NodeCount) {
       }
     }
     else if (head->type == 'A') {
-      input1 = GetInput(l, head->input1, NodeCount);
-      input2 = GetInput(l, head->input2, NodeCount);
+      input1 = GetInput(l, head->input->data, NodeCount);
+      input2 = GetInput(l, head->input->next->data, NodeCount);
       head->output = and(input1, input2);
     }
     else if (head->type == 'O') {
-      input1 = GetInput(l, head->input1, NodeCount);
-      input2 = GetInput(l, head->input2, NodeCount);
+      input1 = GetInput(l, head->input->data, NodeCount);
+      input2 = GetInput(l, head->input->next->data, NodeCount);
       head->output = or(input1, input2);
     }
     else if (head->type == 'X') {
-      input1 = GetInput(l, head->input1, NodeCount);
-      input2 = GetInput(l, head->input2, NodeCount);
+      input1 = GetInput(l, head->input->data, NodeCount);
+      input2 = GetInput(l, head->input->next->data, NodeCount);
       head->output = xor(input1, input2);
     }
     else if (head->type == 'N') {
-      input1 = GetInput(l, head->input1, NodeCount);
+      input1 = GetInput(l, head->input->data, NodeCount);
       head->output = not(input1);
     }
     else if (head->type == 'Q') {
-      input1 = GetInput(l,head->input1, NodeCount);
+      input1 = GetInput(l,head->input->data, NodeCount);
       printf("Output at Id %d: %d\n", head->id, input1);
     }
     head = head->next;

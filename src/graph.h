@@ -1,8 +1,12 @@
+typedef struct inputnode_tag {
+  int data;
+  struct inputnode_tag *next;
+} InputNode;
+
 typedef struct node_tag {
   int id;
   char type;
-  int input1;
-  int input2;
+  InputNode *input;
   int output;
   struct node_tag *next;
   struct node_tag *prev;

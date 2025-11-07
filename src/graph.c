@@ -10,8 +10,7 @@ void InitializeList(NodeList *l) {
 
 int CreateCircuitList(FILE *f, NodeList *l) {
   char buffer[64];
-  int id, in1, in2, i;
-  char type;
+  int i;
 
   if (fgets(buffer, sizeof(buffer), f) == NULL) {
     printf("Empty File");
@@ -28,37 +27,53 @@ int CreateCircuitList(FILE *f, NodeList *l) {
       continue;
     }
 
-    if (sscanf(buffer, "%d: %c %d %d", &id, &type, &in1, &in2) != 4) {
-      printf("Warning invalidline: %s", buffer);
-      continue;
-    }
-
     Node *n = malloc(sizeof(Node));
     if (n == NULL) {
       printf("Malloc Failed");
       exit(1);
     }
 
-    InputNode *first = malloc(sizeof(InputNode));
-    if (first == NULL) {
-      printf("Malloc Failed\n");
-      exit(1);
-    }
-    first->data = in1;
-
-    InputNode *second = malloc(sizeof(InputNode));
-    if (second == NULL) {
-      printf("Malloc Failed\n");
-      exit(1);
-    }
-    second->data = in2;
-    second->next = NULL;
-
-    first->next = second;
-    n->input = first;
     n->output = 0;
-    n->id = id;
-    n->type = type;
+
+    int j, t = 0, IDFlag = 0, FirstInputFlag = 0;
+    char temp[20];
+    InputNode *tail = NULL;
+    for (j = 0; buffer[j] != '\0'; j++) {
+      if (buffer[j] == 'I' || buffer[j] == 'N' || buffer[j] == 'A' || buffer[j] == 'O' || buffer[j] == 'X' || buffer[j] == 'Q') {
+        n->type = buffer[j];
+      }
+      else if (buffer[j] >= '0' && buffer[j] <= '9') {
+        if (t < (int)sizeof(temp) - 1) {
+          temp[t++] = buffer[j];
+        }
+      }
+      else if (t > 0) {
+        temp[t] = '\0';
+        if (IDFlag == 0) {
+          n->id = atoi(temp);
+          IDFlag = 1;
+        }
+        else {
+          InputNode *CurInput = malloc(sizeof(InputNode));
+          if (CurInput == NULL) {
+            printf("Malloc Failed\n");
+            exit(1);
+          }
+          CurInput->data = atoi(temp);
+          CurInput->next = NULL;
+          if (FirstInputFlag == 0) {
+            n->input = CurInput;
+            tail = CurInput;
+            FirstInputFlag = 1;
+          } else {
+            tail->next = CurInput;
+            tail = CurInput;
+          }
+        }
+        t = 0;
+      }
+    }
+
     if (l->first == NULL) {
       n->prev = n->next = NULL;
       l->first = l->last = n;
@@ -76,7 +91,17 @@ int CreateCircuitList(FILE *f, NodeList *l) {
 void PrintCircuit(NodeList *l) {
   Node *head = l->first;
   while (head != NULL) {
-    printf("Id: %d Type: %c Input: %d %d\n", head->id, head->type, head->input->data, head->input->next->data);
+    printf("Id: %d Type: %c Inputs:", head->id, head->type);
+    InputNode *in = head->input;
+    if (in == NULL) {
+      printf(" (none)");
+    } else {
+      while (in != NULL) {
+        printf(" %d", in->data);
+        in = in->next;
+      }
+    }
+    printf("\n");
     head = head->next;
   }
 }

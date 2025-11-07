@@ -23,8 +23,6 @@ int main(int argc, char *argv[]) {
 
   SimulateCircuit(&list, NodeCount);
 
-
-
   FreeCircuitList(&list);
   fclose(logicCircuit);
   return 0;

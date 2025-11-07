@@ -137,14 +137,10 @@ void SimulateCircuit(NodeList *l, int NodeCount) {
       }
     }
     else if (head->type == 'A') {
-      input1 = GetInput(l, head->input->data, NodeCount);
-      input2 = GetInput(l, head->input->next->data, NodeCount);
-      head->output = and(input1, input2);
+      head->output = and_n(l, head->input, NodeCount);
     }
     else if (head->type == 'O') {
-      input1 = GetInput(l, head->input->data, NodeCount);
-      input2 = GetInput(l, head->input->next->data, NodeCount);
-      head->output = or(input1, input2);
+      head->output = or_n(l, head->input, NodeCount);
     }
     else if (head->type == 'X') {
       input1 = GetInput(l, head->input->data, NodeCount);
